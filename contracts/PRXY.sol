@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 contract ProxyCoin is ERC20Burnable, Ownable {
   using SafeMath for uint256;
   uint256 public perBlockSupply = 2391000 * 1e18;
-  address public stakingContrAddr;
   uint256 public lastMintBlock;
   uint256 public mintDuration = 210000;
   address public treasuryWallet;
@@ -21,7 +20,7 @@ contract ProxyCoin is ERC20Burnable, Ownable {
 
   constructor (address _treasuryWallet) ERC20("Proxy Coin", "PRXY") {
     _setupDecimals(18);
-    lastMintBlock = block.timestamp;
+    lastMintBlock = block.number;
     treasuryWallet = _treasuryWallet;
     _mint(treasuryWallet, perBlockSupply);
     mintCycle++;
@@ -30,8 +29,8 @@ contract ProxyCoin is ERC20Burnable, Ownable {
   function startMinting() external onlyOwner {
     require(!mintingFinished(), "Err: Minting Finished");
     require(getMintingStatus(), "Err: Minting not allowed");
-    lastMintBlock = block.timestamp;
-    perBlockSupply = (perBlockSupply * 10).div(9);
+    lastMintBlock = block.number;
+    perBlockSupply = (perBlockSupply * 9).div(10);
     _mint(treasuryWallet, perBlockSupply);
   }
 
@@ -48,9 +47,13 @@ contract ProxyCoin is ERC20Burnable, Ownable {
     emit MintDurationChanged(mintDuration, _mintDuration);
     mintDuration = _mintDuration;
   }
+  
+  function getBlockDifference() public view returns(uint256) {
+    return (block.number - lastMintBlock);
+  }
 
   function getMintingStatus() public view returns(bool) {
-    return ((lastMintBlock + mintDuration) > block.timestamp);
+    return ((block.number - lastMintBlock) > mintDuration);
   }
 
   function mintingFinished() public view returns(bool) {

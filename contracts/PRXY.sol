@@ -18,12 +18,16 @@ contract ProxyCoin is ERC20Burnable, Ownable {
   event MintDurationChanged(uint256 oldValue, uint256 newValue);
   event MintCycleCapChanged(uint256 oldValue, uint256 newValue);
 
-  constructor (address _treasuryWallet, uint256 _lastMintBlock) ERC20("Proxy Coin", "PRXY") {
+  constructor (address _treasuryWallet) ERC20("Proxy Coin", "PRXY") {
     _setupDecimals(18);
-    lastMintBlock = _lastMintBlock;
+    lastMintBlock = block.number;
     treasuryWallet = _treasuryWallet;
     _mint(treasuryWallet, perBlockSupply);
     mintCycle++;
+  }
+  
+  function setStartBlock(uint256 _lastMintBlock) external onlyOwner {
+    lastMintBlock = _lastMintBlock;
   }
 
   function startMinting() external onlyOwner {
@@ -49,11 +53,11 @@ contract ProxyCoin is ERC20Burnable, Ownable {
   }
   
   function getBlockDifference() public view returns(uint256) {
-    return (block.number - lastMintBlock);
+    return (block.number.sub(lastMintBlock));
   }
 
   function getMintingStatus() public view returns(bool) {
-    return ((block.number - lastMintBlock) > mintDuration);
+    return ((block.number.sub(lastMintBlock)) > mintDuration);
   }
 
   function mintingFinished() public view returns(bool) {

@@ -15,6 +15,8 @@ contract ProxyCoin is ERC20Burnable, Ownable {
   uint256 public mintCycle;
   uint256 public mintCycleCap = 20;
 
+  bool public setStartBlock;
+
   event MintDurationChanged(uint256 oldValue, uint256 newValue);
   event MintCycleCapChanged(uint256 oldValue, uint256 newValue);
 
@@ -27,6 +29,7 @@ contract ProxyCoin is ERC20Burnable, Ownable {
   }
   
   function setStartBlock(uint256 _lastMintBlock) external onlyOwner {
+    require(!startBlockSet, "start block already set");
     lastMintBlock = _lastMintBlock;
   }
 

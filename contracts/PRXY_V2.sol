@@ -4,8 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract ProxyCoin_V2 is ERC20Burnable, Ownable, Pausable {
+    using SafeERC20 for IERC20;
+
     mapping(address => bool) public isLocked;
     mapping(address => bool) public whitelist;
 
@@ -32,7 +35,15 @@ contract ProxyCoin_V2 is ERC20Burnable, Ownable, Pausable {
         _burn(addr, amount);
     }
 
-    function addToWhitelist(address _address) public onlyOwner {
+    function stopMinting() external onlyOwner {
+        _pause();
+    }
+
+    function startMinting() external onlyOwner {
+        _unpause();
+    }
+
+    function addToWhitelist(address _address) external onlyOwner {
         whitelist[_address] = true;
     }
 
@@ -46,6 +57,17 @@ contract ProxyCoin_V2 is ERC20Burnable, Ownable, Pausable {
 
     function unLockTransfer(address _addr) external onlyOwner {
         isLocked[_addr] = false;
+    }
+
+    function recoverExcessToken(address token, uint256 amount)
+        external
+        onlyOwner
+    {
+        IERC20(token).safeTransfer(_msgSender(), amount);
+    }
+
+    receive() external payable {
+        revert("ProxyCoin_V2: Not allowed");
     }
 
     function _beforeTokenTransfer(

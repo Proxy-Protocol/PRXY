@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract ProxyCoin_V2 is ERC20Burnable, Ownable, Pausable {
+contract ProxyTokenV2 is ERC20Burnable, Ownable, Pausable {
     using SafeERC20 for IERC20;
 
     mapping(address => bool) public isLocked;

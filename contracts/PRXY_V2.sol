@@ -20,7 +20,6 @@ contract ProxyTokenV2 is ERC20Burnable, Ownable, Pausable {
 
     function mintByWhitelisted(address addr, uint256 amount)
         external
-        onlyOwner
         whenNotPaused
     {
         require(whitelist[_msgSender()], "ProxyCoin_V2: Not whiteslisted");
